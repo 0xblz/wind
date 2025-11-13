@@ -1,50 +1,9 @@
-// Reset default styles
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-// Body and HTML setup for full viewport
-html, body {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background-color: black;
-}
-
-// Canvas styles
-canvas {
-    display: block;
-    width: 100%;
-    height: 100%;
-}
-
-.dg {
-  font: 12px "Geist", system-ui, sans-serif !important;
-}
-
-.dg .cr.string input[type=text] {
-  font: 12px "Geist", system-ui, sans-serif !important;
-}
-
 // Navigation containers
 .date-nav-container, .time-nav-container {
     display: flex;
     align-items: center;
     gap: 8px;
     width: 100%;
-
-    .dg .c {
-        input[type="text"] {
-            width: 100% !important;
-            text-align: center;
-        }
-
-        .property-name {
-            width: 100% !important;
-        }
-    }
 }
 
 // Navigation button
@@ -54,11 +13,11 @@ canvas {
     color: #fff;
     padding: 2px 8px;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 0.75rem;
     border-radius: 2px;
 
     &:hover {
-        background: #404040;
+        background: var(--primary-color);
     }
 }
 
@@ -69,7 +28,7 @@ canvas {
     height: 0;
     border-left: 6px solid transparent;
     border-right: 6px solid transparent;
-    border-bottom: 16px solid #00ddff;
+    border-bottom: 16px solid var(--secondary-color);
     transform-origin: center bottom;
     pointer-events: none;
     z-index: 1 !important; // Fix z-index so they don't appear above GUI
@@ -79,16 +38,15 @@ canvas {
 
 #demo-label {
   position: fixed;
-  bottom: 10px;
-  left: 10px;
-  background: rgba(0, 0, 0, 0.8);
+  bottom: 1rem;
+  left: 1rem;
+  background: rgba(0, 0, 0, 0.6);
   color: white;
-  padding: 8px 12px;
-  font-family: 'Geist', system-ui, sans-serif;
-  font-size: 12px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.5px;
-  border-radius: 4px;
+  border-radius: 0.25rem;
   z-index: 10000;
   pointer-events: none;
   user-select: none;
@@ -98,12 +56,11 @@ canvas {
 
 #tooltip {
   position: absolute;
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: rgba(0, 0, 0, 0.6);
   color: white;
-  padding: 8px 12px;
-  border-radius: 12px;
-  font-size: 14px;
-  font-family: 'Geist', system-ui, sans-serif;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  font-size: 0.8rem;
   pointer-events: none;
   z-index: 1000;
   display: none;
@@ -135,7 +92,7 @@ canvas {
   width: 50%;
   height: 100%;
   position: relative;
-  background: #2a3f2a;
+  background: black;
   border-bottom: none;
   min-width: 200px;
   
@@ -150,14 +107,14 @@ canvas {
 
 #splitter {
   width: 8px;
-  background: #444;
+  background: black;
   cursor: ew-resize;
   position: relative;
   flex-shrink: 0;
   transition: background-color 0.2s ease;
 
   &:hover {
-    background: #666;
+    background: white;
   }
 
   &::after {
@@ -166,25 +123,20 @@ canvas {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 2px;
-    height: 30px;
-    background: #888;
-    border-radius: 1px;
+    width: 0.25rem;
+    height: 3rem;
+    background: gray;
+    border-radius: 999px;
   }
   
   @media screen and (max-width: 768px) {
     width: 100% !important;
     height: 12px !important;
     cursor: ns-resize !important;
-    background: #444 !important;
-    
-    &:hover {
-      background: #666 !important;
-    }
     
     &::after {
-      width: 30px !important;
-      height: 2px !important;
+      width: 3rem !important;
+      height: 0.25rem !important;
       top: 50% !important;
       left: 50% !important;
     }
@@ -236,9 +188,4 @@ canvas {
     &:hover {
         opacity: 1.0 !important;
     }
-}
-
-// Ensure dat.GUI has higher z-index
-.dg.ac {
-    z-index: 9999 !important;
 }
