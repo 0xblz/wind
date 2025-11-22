@@ -26,22 +26,12 @@ const Splitter = {
     this.isDragging = true;
     
     const mapPanel = document.getElementById('map-panel');
-    const isMobile = window.innerWidth <= 768;
     
-    console.log('Starting drag - isMobile:', isMobile, 'window width:', window.innerWidth);
-    
-    if (isMobile) {
-      this.startY = event.type === 'mousedown' ? event.clientY : event.touches[0].clientY;
-      this.startMapHeight = mapPanel.offsetHeight;
-      console.log('Mobile drag start - startY:', this.startY, 'startMapHeight:', this.startMapHeight);
-    } else {
-      this.startX = event.type === 'mousedown' ? event.clientX : event.touches[0].clientX;
-      this.startMapWidth = mapPanel.offsetWidth;
-      console.log('Desktop drag start - startX:', this.startX, 'startMapWidth:', this.startMapWidth);
-    }
+    this.startY = event.type === 'mousedown' ? event.clientY : event.touches[0].clientY;
+    this.startMapHeight = mapPanel.offsetHeight;
     
     document.body.style.userSelect = 'none';
-    document.body.style.cursor = isMobile ? 'ns-resize' : 'ew-resize';
+    document.body.style.cursor = 'ns-resize';
   },
   
   drag(event) {
@@ -49,52 +39,22 @@ const Splitter = {
     event.preventDefault();
     
     const mapPanel = document.getElementById('map-panel');
-    const canvasPanel = document.getElementById('canvas-panel');
     const container = document.getElementById('app-container');
-    const isMobile = window.innerWidth <= 768;
     
-    if (isMobile) {
-      // Vertical resizing for mobile
-      const currentY = event.type === 'mousemove' ? event.clientY : event.touches[0].clientY;
-      const deltaY = currentY - this.startY;
-      const newHeight = this.startMapHeight + deltaY;
-      const containerHeight = container.offsetHeight;
-      
-      // Enforce minimum heights
-      const minHeight = 150;
-      const maxHeight = containerHeight - minHeight - 4; // 4px for splitter
-      
-      console.log('Mobile drag - currentY:', currentY, 'deltaY:', deltaY, 'newHeight:', newHeight, 'containerHeight:', containerHeight);
-      
-      if (newHeight >= minHeight && newHeight <= maxHeight) {
-        const heightPercentage = (newHeight / containerHeight) * 100;
-        console.log('Setting height to:', heightPercentage + '%');
-        mapPanel.style.setProperty('height', `${heightPercentage}%`, 'important');
-        // Canvas panel will flex to fill remaining space
-      } else {
-        console.log('Height out of bounds - min:', minHeight, 'max:', maxHeight, 'attempted:', newHeight);
-      }
-    } else {
-      // Horizontal resizing for desktop
-      const currentX = event.type === 'mousemove' ? event.clientX : event.touches[0].clientX;
-      const deltaX = currentX - this.startX;
-      const newWidth = this.startMapWidth + deltaX;
-      const containerWidth = container.offsetWidth;
-      
-      // Enforce minimum widths
-      const minWidth = 200;
-      const maxWidth = containerWidth - minWidth - 4; // 4px for splitter
-      
-      console.log('Desktop drag - currentX:', currentX, 'deltaX:', deltaX, 'newWidth:', newWidth, 'containerWidth:', containerWidth);
-      
-      if (newWidth >= minWidth && newWidth <= maxWidth) {
-        const widthPercentage = (newWidth / containerWidth) * 100;
-        console.log('Setting width to:', widthPercentage + '%');
-        mapPanel.style.setProperty('width', `${widthPercentage}%`, 'important');
-        // Canvas panel will flex to fill remaining space
-      } else {
-        console.log('Width out of bounds - min:', minWidth, 'max:', maxWidth, 'attempted:', newWidth);
-      }
+    // Vertical resizing only
+    const currentY = event.type === 'mousemove' ? event.clientY : event.touches[0].clientY;
+    const deltaY = currentY - this.startY;
+    const newHeight = this.startMapHeight + deltaY;
+    const containerHeight = container.offsetHeight;
+    
+    // Enforce minimum heights - use 20% of container height or 150px, whichever is smaller
+    const minHeight = Math.min(150, containerHeight * 0.2);
+    const maxHeight = containerHeight - minHeight - 12; // 12px for splitter
+    
+    if (newHeight >= minHeight && newHeight <= maxHeight) {
+      const heightPercentage = (newHeight / containerHeight) * 100;
+      mapPanel.style.setProperty('height', `${heightPercentage}%`, 'important');
+      // Canvas panel will flex to fill remaining space
     }
     
     // Throttle resize events during drag

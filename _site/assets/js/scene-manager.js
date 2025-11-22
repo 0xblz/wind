@@ -18,8 +18,8 @@ const SceneManager = {
   setupCamera() {
     const canvas = document.getElementById('three-canvas');
     const rect = canvas.getBoundingClientRect();
-    AppState.camera = new THREE.PerspectiveCamera(75, rect.width / rect.height, 0.1, 1000);
-    AppState.camera.position.set(20, 25, 20);
+    AppState.camera = new THREE.PerspectiveCamera(45, rect.width / rect.height, 0.1, 1000);
+    AppState.camera.position.set(15, 25, 15);
   },
 
   setupRenderer() {
@@ -36,6 +36,17 @@ const SceneManager = {
     AppState.controls.enableDamping = true;
     AppState.controls.dampingFactor = 0.05;
     AppState.controls.enablePan = false;
+    
+    // Enable zoom with mouse wheel and touch gestures
+    AppState.controls.enableZoom = true;
+    AppState.controls.zoomSpeed = 1.0;
+    
+    // Set zoom distance limits (how close/far you can zoom)
+    AppState.controls.minDistance = 5;
+    AppState.controls.maxDistance = 50;
+    
+    // Set target to center of scene
+    AppState.controls.target.set(0, 5, 0);
   },
 
   setupLighting() {

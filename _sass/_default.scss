@@ -1,3 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+:root {
+    --font-family: 'Ubuntu Mono', monospace;
+}
+
 // Body and HTML setup for full viewport
 html, body {
     width: 100%;
@@ -13,14 +19,17 @@ body {
     line-height: 1em;
     color: white;
     background: black;
+    margin: 0;
+    padding: 0;
 }
 
 main {
     display: flex;
     flex-direction: column;
-    align-items: center;
     height: 100%;
     width: 100%;
+    margin: 0;
+    padding: 0;
     
     article {
         display: flex;
@@ -33,6 +42,7 @@ main {
         max-width: 800px;
         align-items: center;
         justify-content: center;
+        margin: 0 auto;
     }
 }
 

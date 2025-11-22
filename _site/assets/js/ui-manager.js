@@ -1,7 +1,7 @@
 // === UI MANAGEMENT ===
 const UIManager = {
   init() {
-    this.createGUI();
+    this.setupGUI();
     this.createTooltip();
     TimeControls.updateDisplay();
   },
@@ -38,73 +38,94 @@ const UIManager = {
     AppState.tooltip.className = '';
   },
 
-  createGUI() {
-    AppState.gui = new dat.GUI();
-    AppState.gui.width = 300;
-    
-    // Add status display at the top
-    const statusController = AppState.gui.add({ status: 'Simulated Data' }, 'status')
-      .name('Status')
-      .listen();
-    
-    // Make the status field read-only
-    const statusInput = statusController.domElement.querySelector('input');
-    statusInput.readOnly = true;
-    statusInput.style.opacity = '0.7';
-    statusInput.style.cursor = 'default';
-    
-    AppState.gui.add(Config.settings, 'state', Object.keys(StateCoordinates))
-      .name('US State')
-      .onChange(StateManager.updateState.bind(StateManager));
-    
-    AppState.gui.add(Config.settings, 'mapStyle', ['OpenStreetMap', 'Satellite', 'Terrain'])
-      .name('Map Style')
-      .onChange(MapManager.updateStyle.bind(MapManager));
-    
-    this.createOptionsFolder();
-    this.createSimulationsFolder();
-    this.createTimeFolder();
-  },
+  setupGUI() {
+    // Populate state dropdown
+    const stateSelect = document.getElementById('gui-state');
+    Object.keys(StateCoordinates).forEach(stateName => {
+      const option = document.createElement('option');
+      option.value = stateName;
+      option.textContent = stateName;
+      if (stateName === Config.settings.state) {
+        option.selected = true;
+      }
+      stateSelect.appendChild(option);
+    });
 
-  createOptionsFolder() {
-    const optionsFolder = AppState.gui.addFolder('Options');
-    
-    optionsFolder.add(Config.settings, 'darkBackground')
-      .name('Dark Background')
-      .onChange(SceneManager.updateBackgroundColor.bind(SceneManager));
-    
-    optionsFolder.add(Config.settings, 'showWindArrows')
-      .name('Wind Direction')
-      .onChange(SelectionManager.toggleWindArrows.bind(SelectionManager));
-    
-    optionsFolder.add(Config.settings, 'cubeOpacity', 0.01, 0.3)
-      .name('Cube Opacity')
-      .onChange(this.updateCubeOpacity.bind(this));
-  },
+    // State selector
+    stateSelect.addEventListener('change', (e) => {
+      StateManager.updateState(e.target.value);
+    });
 
-  createSimulationsFolder() {
-    const simulationsFolder = AppState.gui.addFolder('Simulations');
-    
-    simulationsFolder.add(Config.settings, 'thunderstormActive')
-      .name('Thunderstorm')
-      .onChange(this.onStormToggle.bind(this, 'thunderstorm'));
-    
-    simulationsFolder.add(Config.settings, 'hurricaneActive')
-      .name('Hurricane')
-      .onChange(this.onStormToggle.bind(this, 'hurricane'));
-    
-    simulationsFolder.add(Config.settings, 'hurricaneIntensity', 1, 5, 1)
-      .name('Hurricane Category')
-      .onChange(this.onHurricaneIntensityChange.bind(this));
-    
-    simulationsFolder.add({ randomizeWind: () => this.randomizeWind() }, 'randomizeWind')
-      .name('Randomize Wind');
-  },
+    // Map style selector
+    const mapStyleSelect = document.getElementById('gui-map-style');
+    mapStyleSelect.value = Config.settings.mapStyle;
+    mapStyleSelect.addEventListener('change', (e) => {
+      Config.settings.mapStyle = e.target.value;
+      MapManager.updateStyle(e.target.value);
+    });
 
-  createTimeFolder() {
-    const timeFolder = AppState.gui.addFolder('Date & Time');
-    TimeControls.createDateController(timeFolder);
-    TimeControls.createTimeController(timeFolder);
+    // Dark background checkbox
+    const darkBgCheckbox = document.getElementById('gui-dark-background');
+    darkBgCheckbox.checked = Config.settings.darkBackground;
+    darkBgCheckbox.addEventListener('change', (e) => {
+      Config.settings.darkBackground = e.target.checked;
+      SceneManager.updateBackgroundColor(e.target.checked);
+    });
+
+    // Wind arrows checkbox
+    const windArrowsCheckbox = document.getElementById('gui-wind-arrows');
+    windArrowsCheckbox.checked = Config.settings.showWindArrows;
+    windArrowsCheckbox.addEventListener('change', (e) => {
+      Config.settings.showWindArrows = e.target.checked;
+      SelectionManager.toggleWindArrows(e.target.checked);
+    });
+
+    // Cube opacity slider
+    const cubeOpacitySlider = document.getElementById('gui-cube-opacity');
+    const cubeOpacityValue = document.getElementById('gui-cube-opacity-value');
+    cubeOpacitySlider.value = Config.settings.cubeOpacity;
+    cubeOpacityValue.textContent = Config.settings.cubeOpacity.toFixed(2);
+    cubeOpacitySlider.addEventListener('input', (e) => {
+      Config.settings.cubeOpacity = parseFloat(e.target.value);
+      cubeOpacityValue.textContent = Config.settings.cubeOpacity.toFixed(2);
+      this.updateCubeOpacity();
+    });
+
+    // Thunderstorm checkbox
+    const thunderstormCheckbox = document.getElementById('gui-thunderstorm');
+    thunderstormCheckbox.checked = Config.settings.thunderstormActive;
+    thunderstormCheckbox.addEventListener('change', (e) => {
+      Config.settings.thunderstormActive = e.target.checked;
+      this.onStormToggle('thunderstorm', e.target.checked);
+    });
+
+    // Hurricane checkbox
+    const hurricaneCheckbox = document.getElementById('gui-hurricane');
+    hurricaneCheckbox.checked = Config.settings.hurricaneActive;
+    hurricaneCheckbox.addEventListener('change', (e) => {
+      Config.settings.hurricaneActive = e.target.checked;
+      this.onStormToggle('hurricane', e.target.checked);
+    });
+
+    // Hurricane intensity slider
+    const hurricaneIntensitySlider = document.getElementById('gui-hurricane-intensity');
+    const hurricaneIntensityValue = document.getElementById('gui-hurricane-intensity-value');
+    hurricaneIntensitySlider.value = Config.settings.hurricaneIntensity;
+    hurricaneIntensityValue.textContent = Config.settings.hurricaneIntensity;
+    hurricaneIntensitySlider.addEventListener('input', (e) => {
+      Config.settings.hurricaneIntensity = parseInt(e.target.value);
+      hurricaneIntensityValue.textContent = Config.settings.hurricaneIntensity;
+      this.onHurricaneIntensityChange();
+    });
+
+    // Randomize wind button
+    const randomizeButton = document.getElementById('gui-randomize-wind');
+    randomizeButton.addEventListener('click', () => {
+      this.randomizeWind();
+    });
+
+    // Date and time controls
+    TimeControls.setupControls();
   },
 
   onStormToggle(stormType, value) {
@@ -163,10 +184,40 @@ const UIManager = {
 
 // === TIME CONTROLS ===
 const TimeControls = {
+  setupControls() {
+    // Date controls
+    document.getElementById('gui-date-prev').addEventListener('click', () => {
+      this.changeDate(-1);
+    });
+    
+    document.getElementById('gui-date-next').addEventListener('click', () => {
+      this.changeDate(1);
+    });
+
+    // Time controls
+    document.getElementById('gui-time-prev').addEventListener('click', () => {
+      this.changeTime(-1);
+    });
+    
+    document.getElementById('gui-time-next').addEventListener('click', () => {
+      this.changeTime(1);
+    });
+
+    // Initial display
+    this.updateDisplay();
+  },
+
   updateDisplay() {
-    Config.settings.currentDate = Utils.formatDate(AppState.currentDate);
-    Config.settings.currentTime = Utils.formatTime(AppState.currentTime);
-    AppState.gui?.updateDisplay();
+    const dateValue = document.getElementById('gui-date-value');
+    const timeValue = document.getElementById('gui-time-value');
+    
+    if (dateValue) {
+      dateValue.textContent = Utils.formatDate(AppState.currentDate);
+    }
+    
+    if (timeValue) {
+      timeValue.textContent = Utils.formatTime(AppState.currentTime);
+    }
   },
 
   changeDate(days) {
@@ -192,53 +243,6 @@ const TimeControls = {
     
     this.updateDisplay();
     WindGenerator.regenerate();
-  },
-
-  createDateController(folder) {
-    const dateController = folder.add(Config.settings, 'currentDate').name('Date').listen();
-    const dateRow = dateController.domElement.parentElement.parentElement;
-    
-    this.setupNavigationRow(dateRow, () => this.changeDate(-1), () => this.changeDate(1));
-    
-    const dateInput = dateController.domElement.querySelector('input');
-    Utils.applyElementStyles(dateInput, { readOnly: true, textAlign: 'center', width: '100%' });
-    dateInput.parentElement.style.width = '120px';
-  },
-
-  createTimeController(folder) {
-    const timeController = folder.add(Config.settings, 'currentTime').name('Time').listen();
-    const timeRow = timeController.domElement.parentElement.parentElement;
-    
-    this.setupNavigationRow(timeRow, () => this.changeTime(-1), () => this.changeTime(1));
-    
-    const timeInput = timeController.domElement.querySelector('input');
-    Utils.applyElementStyles(timeInput, { readOnly: true, textAlign: 'center', width: '100%' });
-    timeInput.parentElement.style.width = '120px';
-  },
-
-  setupNavigationRow(row, prevCallback, nextCallback) {
-    Utils.applyElementStyles(row, { display: 'flex', alignItems: 'center', gap: '8px' });
-    
-    const label = row.querySelector('.property-name');
-    row.insertBefore(label, row.firstChild);
-    
-    const buttonsContainer = document.createElement('div');
-    Utils.applyElementStyles(buttonsContainer, { display: 'flex', gap: '4px' });
-    
-    const prevBtn = this.createNavButton('←', prevCallback);
-    const nextBtn = this.createNavButton('→', nextCallback);
-    
-    buttonsContainer.appendChild(prevBtn);
-    buttonsContainer.appendChild(nextBtn);
-    row.appendChild(buttonsContainer);
-  },
-
-  createNavButton(text, callback) {
-    const button = document.createElement('button');
-    button.className = 'nav-button';
-    button.textContent = text;
-    button.onclick = callback;
-    return button;
   }
 }; 
 

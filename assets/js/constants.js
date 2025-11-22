@@ -17,7 +17,7 @@ const CONSTANTS = {
 const Config = {
   settings: {
     state: 'Florida',
-    cubeOpacity: 0.03,
+    cubeOpacity: 0.05,
     mapStyle: 'Terrain',
     darkBackground: true,
     showWindArrows: false,
@@ -37,7 +37,7 @@ const AppState = {
   windCubes: [], windArrows: [], groundPlane: null, arrowGeometry: null, arrowMaterial: null,
   raycaster: new THREE.Raycaster(), mouse: new THREE.Vector2(), isHovering: false,
   selectedFlightLevel: null, selectedCubes: [], isDragging: false, mouseDownPosition: { x: 0, y: 0 },
-  gui: null, tooltip: null, leafletMap: null, mapCanvas: null, mapContext: null, mapTexture: null,
+  tooltip: null, leafletMap: null, mapCanvas: null, mapContext: null, mapTexture: null,
   windDataBounds: null, windMapMarkers: [],
   currentDate: new Date(), currentTime: { hour: new Date().getHours(), minute: new Date().getMinutes() }
 }; 
